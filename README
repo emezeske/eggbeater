@@ -1,0 +1,36 @@
+eggbeater
+
+================================================================================
+OVERVIEW
+================================================================================
+
+This hack-week project attempts to use brute force to discover the Meebo session
+key secret.  It takes the initial part of the session key (ip:port:salt), appends
+a possible secret key, takes the SHA-1 hash, and compares the result to a hash
+that is known to be good.
+
+This is a lot of computation, so eggbeater offloads the secret key generation,
+SHA-1 calculation, and verification to the GPU using PyCUDA.  On my system, with
+a GeForce GTX 560 Ti, it's capable of checking about 100,000,000 secrets per second.
+
+The Meebo secret key is 9 characters of lowercase alpha and digits.  Thus, a
+brute-force crack needs to try 36^9 keys, which on my machine will take about 11 days.
+
+Amazon EC2 offers GPU instances that come with 2 beefy GPUs each for about $2 an hour.
+Pessimistically, these should each be able to check about 720,000,000,000 keys per hour.
+Thus, for about $140, the Meebo session key could be brute forced in less than one hour.
+
+================================================================================
+USE
+================================================================================
+
+Requires PyCUDA, Numpy, and a decent NVIDIA GPU (with compute capability >= 2).
+The top of the script has some tweakable parameters.  Run with:
+
+    python eggbeater.py
+
+================================================================================
+CAVEATS
+================================================================================
+
+I threw this together hastily for hack week.  It's ugly and probably broken! ^_^
